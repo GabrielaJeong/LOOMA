@@ -1,0 +1,40 @@
+/* 전역 스타일 */
+/* Mobile-first: 기준 375px */
+/* min font-size: 14px */
+/* min touch target: 44px */
+
+:root {
+  /* Color tokens - TBD */
+  --color-primary: ;
+  --color-background: ;
+  --color-surface: ;
+  --color-text-primary: ;
+  --color-text-secondary: ;
+  --color-border: ;
+
+  /* Spacing tokens */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* Touch target */
+  --touch-target-min: 44px;
+
+  /* Font */
+  --font-size-min: 14px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  max-width: 430px;
+  margin: 0 auto;
+  font-size: var(--font-size-min);
+}
