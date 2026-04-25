@@ -1,4 +1,4 @@
-// 환경변수 검증 및 내보내기
+// Validate and export environment variables
 
 const required = [
   "MONGODB_URI",
@@ -12,6 +12,17 @@ const required = [
 ];
 
 function validateEnv() {
+  console.log("[env] Checking required environment variables -----------");
+  required.forEach((key) => {
+    const val = process.env[key];
+    const status =
+      val === undefined ? "MISSING (undefined)" :
+      val === ""        ? "MISSING (empty string)" :
+                          `OK (length: ${val.length})`;
+    console.log(`  ${key}: ${status}`);
+  });
+  console.log("[env] ---------------------------------------------------");
+
   const missing = required.filter((key) => !process.env[key]);
   if (missing.length > 0) {
     throw new Error(`Missing required environment variables: ${missing.join(", ")}`);
