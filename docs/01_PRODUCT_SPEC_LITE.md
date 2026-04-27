@@ -39,6 +39,14 @@
 - 캘린더 기반 과거 기록 조회
 - 마이페이지 (정보 수정, 알림 설정, 로그아웃, 회원 탈퇴)
 
+### 🧪 현재 프론트 프리뷰 기준 메모
+- 현재 프론트 MVP 프리뷰는 **카카오 실연동과 약관 화면을 임시 제외**한 상태로 동작한다.
+- 현재 진입 흐름은 `스플래시/로그인 → 닉네임 입력 → 가입 완료 → 홈 또는 루틴 생성 1단계`이다.
+- 가입 완료 화면의 CTA는 두 개다.
+  - `홈으로` → 홈으로 이동
+  - `시작하기` → 루틴 생성 1단계로 바로 이동
+- 실제 카카오 OAuth, 약관 동의, 회원가입 API 연결은 이후 단계에서 붙인다.
+
 ### ❌ 제외 (구현 금지)
 - 주간/월간 AI 요약지
 - 기록 리마인더 / 푸시 알림
@@ -67,6 +75,11 @@ User (카카오 계정)
 - **같은 루틴을 하루에 여러 번 기록 가능** → Record가 여러 개 생성됨
 - **루틴 삭제해도 과거 Record는 보존** (soft delete, `deletedAt` 사용)
 - **Conversation 모델**: 음성 세션 관리용. MVP에서는 1 세션 = 1 Record 단순 매핑. audioUrls는 STT 완료 후 삭제.
+
+### 프론트 임시 저장 메모
+- 현재 프론트 프리뷰에서는 백엔드 DB 대신 `Zustand + sessionStorage`로 온보딩 상태와 루틴 생성 결과를 임시 유지한다.
+- 현재 루틴 생성 화면에서 사용하는 필드는 `subjectType`, `subjectName`, `gender`, `birthDate`, `heightCm`, `weightKg`, `diseaseName` 이다.
+- 실제 백엔드 연동 시에는 위 임시 필드를 `Patient / Routine` 구조에 맞게 매핑한다.
 
 ### 필드 네이밍
 실제 스키마는 **camelCase** 사용 (Mongoose 관례):
@@ -140,6 +153,7 @@ Whisper API → 텍스트 변환 → 유저 수정 가능
 | 영역 | 기술 |
 |------|------|
 | Frontend | Next.js 14 (App Router) + React 18 |
+| Frontend State | Zustand + sessionStorage (프론트 프리뷰 임시 저장) |
 | Backend | Node.js + Express |
 | Database | MongoDB + Mongoose |
 | Auth | Kakao OAuth 2.0 + JWT |

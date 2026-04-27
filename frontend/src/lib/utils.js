@@ -1,10 +1,25 @@
-// 공통 유틸리티 함수
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
-// 날짜 포맷 (YYYY-MM-DD)
-export function formatDate(date) {}
+export function cn(...inputs) {
+  return twMerge(clsx(inputs));
+}
 
-// 날짜 표시용 한국어 포맷 (예: 2024년 1월 1일)
-export function formatDateKo(date) {}
+export function formatDate(date) {
+  const d = date instanceof Date ? date : new Date(date);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
 
-// 파일 크기 포맷
-export function formatFileSize(bytes) {}
+export function formatDateKo(date) {
+  const d = date instanceof Date ? date : new Date(date);
+  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
+}
+
+export function formatFileSize(bytes) {
+  if (bytes < 1024) return `${bytes}B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)}KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
+}

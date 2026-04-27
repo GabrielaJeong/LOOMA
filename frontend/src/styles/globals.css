@@ -1,40 +1,85 @@
-/* 전역 스타일 */
-/* Mobile-first: 기준 375px */
-/* min font-size: 14px */
-/* min touch target: 44px */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  /* Color tokens - TBD */
-  --color-primary: ;
-  --color-background: ;
-  --color-surface: ;
-  --color-text-primary: ;
-  --color-text-secondary: ;
-  --color-border: ;
+@layer base {
+  :root {
+    --color-primary: #5570f1;
+    --color-kakao: #fee500;
+    --color-background: #ffffff;
+    --color-surface: #f5f7ff;
+    --color-text-primary: #212529;
+    --color-text-secondary: #868e96;
+    --color-border: #e9ecef;
 
-  /* Spacing tokens */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
 
-  /* Touch target */
-  --touch-target-min: 44px;
+    --touch-target-min: 44px;
+    --font-size-min: 14px;
+  }
 
-  /* Font */
-  --font-size-min: 14px;
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html,
+  body {
+    width: 100%;
+    min-height: 100%;
+    font-size: var(--font-size-min);
+    font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
+    background-color: #dfe7f4;
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    min-height: 100dvh;
+    display: flex;
+    justify-content: center;
+  }
+
+  body::-webkit-scrollbar {
+    display: none;
+  }
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+@layer components {
+  .app-shell {
+    @apply relative min-h-[100dvh] w-full max-w-[393px] overflow-hidden bg-white;
+  }
 
-html,
-body {
-  max-width: 430px;
-  margin: 0 auto;
-  font-size: var(--font-size-min);
+  .mobile-container {
+    @apply relative mx-auto min-h-screen w-full max-w-mobile bg-white;
+  }
+
+  .btn-primary {
+    @apply flex h-[52px] w-full items-center justify-center rounded-2xl bg-primary text-lg font-semibold text-white
+           transition-colors active:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  .btn-kakao {
+    @apply flex h-[52px] w-full items-center justify-center gap-2 rounded-2xl bg-kakao text-lg font-semibold text-gray-900
+           transition-all active:brightness-95;
+  }
+
+  .card {
+    @apply rounded-2xl bg-white p-4 shadow-card;
+  }
+
+  .bottom-sheet-overlay {
+    @apply fixed inset-0 z-40 bg-black/40;
+  }
+
+  .bottom-sheet {
+    @apply fixed bottom-0 left-1/2 z-50 w-full max-w-mobile -translate-x-1/2 rounded-t-3xl bg-white pb-safe;
+  }
 }

@@ -1,4 +1,10 @@
-// 메인 레이아웃 - 탭바 포함
+import TabBar from "@/components/layout/TabBar";
+
 export default function MainLayout({ children }) {
-  return <>{children}</>;
+  return (
+    <>
+      <div className="min-h-[100dvh] pb-[96px]">{children}</div>
+      <TabBar />
+    </>
+  );
 }
