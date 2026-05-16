@@ -8,7 +8,6 @@ const required = [
   "KAKAO_CLIENT_SECRET",
   "KAKAO_REDIRECT_URI",
   "OPENAI_API_KEY",
-  "ANTHROPIC_API_KEY",
 ];
 
 function validateEnv() {
@@ -42,6 +41,7 @@ module.exports = {
   KAKAO_CLIENT_SECRET: process.env.KAKAO_CLIENT_SECRET,
   KAKAO_REDIRECT_URI: process.env.KAKAO_REDIRECT_URI,
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-  ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
   LANGSMITH_API_KEY: process.env.LANGSMITH_API_KEY,
+  LANGSMITH_PROJECT: process.env.LANGSMITH_PROJECT || "looma",
+  OPENAI_MODEL: process.env.OPENAI_MODEL || "gpt-4o-mini",
 };

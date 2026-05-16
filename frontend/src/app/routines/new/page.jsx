@@ -4,10 +4,13 @@ import { Check, ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
+import apiClient from "@/lib/apiClient";
 import { cn } from "@/lib/utils";
 import { useRoutineStore } from "@/stores/routineStore";
 
 const SUBJECT_OPTIONS = ["본인", "부모님", "배우자", "자녀", "친구", "기타 (직접 입력)"];
+const CUSTOM_SUBJECT = "기타 (직접 입력)";
+const GENDER_OPTIONS = ["남성", "여성"];
 
 function StepHeader({ title, progress, onBack }) {
   return (
@@ -110,6 +113,7 @@ function isValidBirthDate(value) {
 export default function NewRoutinePage() {
   const router = useRouter();
   const createRoutine = useRoutineStore((state) => state.createRoutine);
+  const saveApiRoutine = useRoutineStore((state) => state.saveApiRoutine);
 
   const [step, setStep] = useState(1);
   const [selectedSubject, setSelectedSubject] = useState("");
@@ -119,11 +123,13 @@ export default function NewRoutinePage() {
   const [heightCm, setHeightCm] = useState("");
   const [weightKg, setWeightKg] = useState("");
   const [diseaseName, setDiseaseName] = useState("");
+  const [isCreatingRoutine, setIsCreatingRoutine] = useState(false);
+  const [createRoutineError, setCreateRoutineError] = useState("");
 
-  const isCustomSubjectStep = step === 1 && selectedSubject === "기타 (직접 입력)";
+  const isCustomSubjectStep = step === 1 && selectedSubject === CUSTOM_SUBJECT;
 
   const subjectName = useMemo(() => {
-    if (selectedSubject === "기타 (직접 입력)") {
+    if (selectedSubject === CUSTOM_SUBJECT) {
       return customSubject.trim();
     }
 
@@ -134,7 +140,7 @@ export default function NewRoutinePage() {
 
   const isStepOneValid =
     !!selectedSubject &&
-    (selectedSubject !== "기타 (직접 입력)" || customSubject.trim().length > 0);
+    (selectedSubject !== CUSTOM_SUBJECT || customSubject.trim().length > 0);
   const isStepTwoValid =
     !!gender &&
     birthDate.length === 10 &&
@@ -163,7 +169,7 @@ export default function NewRoutinePage() {
     setStep((current) => current - 1);
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step === 1 && isStepOneValid) {
       setStep(2);
       return;
@@ -174,18 +180,36 @@ export default function NewRoutinePage() {
       return;
     }
 
-    if (step === 3 && isStepThreeValid) {
-      const finalDiseaseName = diseaseName.trim();
-      createRoutine({
-        subjectType: selectedSubject,
-        subjectName,
-        gender,
-        birthDate,
-        heightCm: heightCm.replace(/\D/g, ""),
-        weightKg: weightKg.replace(/\D/g, ""),
-        diseaseName: finalDiseaseName,
-      });
+    if (step !== 3 || !isStepThreeValid || isCreatingRoutine) {
+      return;
+    }
+
+    const routinePayload = {
+      subjectType: selectedSubject,
+      subjectName,
+      gender,
+      birthDate,
+      heightCm: heightCm.replace(/\D/g, ""),
+      weightKg: weightKg.replace(/\D/g, ""),
+      diseaseName: diseaseName.trim(),
+    };
+
+    try {
+      setIsCreatingRoutine(true);
+      setCreateRoutineError("");
+
+      const response = await apiClient.post("/routines", routinePayload);
+      saveApiRoutine({ apiRoutine: response.routine });
       setStep(4);
+    } catch (error) {
+      createRoutine(routinePayload);
+      setCreateRoutineError(
+        error.message ||
+          "서버 저장에 실패해서 우선 이 기기 안에만 루틴을 만들었어요."
+      );
+      setStep(4);
+    } finally {
+      setIsCreatingRoutine(false);
     }
   };
 
@@ -227,9 +251,9 @@ export default function NewRoutinePage() {
             {isCustomSubjectStep ? (
               <>
                 <SubjectCard
-                  label="기타 (직접 입력)"
+                  label={CUSTOM_SUBJECT}
                   selected
-                  onSelect={() => setSelectedSubject("기타 (직접 입력)")}
+                  onSelect={() => setSelectedSubject(CUSTOM_SUBJECT)}
                 />
                 <input
                   type="text"
@@ -282,7 +306,7 @@ export default function NewRoutinePage() {
             <div className="flex items-center justify-between">
               <span className="text-[18px] font-extrabold text-[#1F2733]">성별</span>
               <div className="flex items-center gap-5">
-                {["남성", "여성"].map((option) => (
+                {GENDER_OPTIONS.map((option) => (
                   <button
                     key={option}
                     type="button"
@@ -364,9 +388,9 @@ export default function NewRoutinePage() {
               무엇을 기록해 볼까요?
             </h2>
             <p className="mt-4 text-[15px] font-medium leading-[1.5] tracking-[-0.02em] text-[#6F8EC9]">
-              관리하려는 질병명 혹은 증상을
+              관리하는 질병명 또는 증상을
               <br />
-              적어주세요.
+              적어주세요
             </p>
           </div>
 
@@ -375,22 +399,32 @@ export default function NewRoutinePage() {
             <input
               type="text"
               value={diseaseName}
-              onChange={(event) => setDiseaseName(event.target.value)}
+              onChange={(event) => {
+                setDiseaseName(event.target.value);
+                setCreateRoutineError("");
+              }}
               placeholder="ex. 역류성 식도염"
               className="mt-6 h-[54px] w-full rounded-[14px] border border-[#BFD0EA] bg-white px-4 text-[18px] font-semibold text-[#1F2733] outline-none placeholder:text-[#B9C7E0]"
             />
+            {createRoutineError ? (
+              <p className="mt-3 text-[13px] font-medium tracking-[-0.02em] text-[#F25F5C]">
+                {createRoutineError}
+              </p>
+            ) : null}
           </div>
 
           <button
             type="button"
             onClick={handleNext}
-            disabled={!isStepThreeValid}
+            disabled={!isStepThreeValid || isCreatingRoutine}
             className={cn(
               "mt-auto flex h-[58px] items-center justify-center rounded-[14px] text-[17px] font-bold text-white transition",
-              isStepThreeValid ? "bg-[#3F69F6] active:brightness-95" : "bg-[#B7C5E2]"
+              isStepThreeValid && !isCreatingRoutine
+                ? "bg-[#3F69F6] active:brightness-95"
+                : "bg-[#B7C5E2]"
             )}
           >
-            다음
+            {isCreatingRoutine ? "저장 중..." : "다음"}
           </button>
         </div>
       ) : null}

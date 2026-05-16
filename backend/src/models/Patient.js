@@ -9,7 +9,6 @@ const patientSchema = new mongoose.Schema(
     birthDate: { type: Date },
     height: { type: Number }, // cm
     weight: { type: Number }, // kg
-    diseaseName: { type: String }, // 질병명
     region: { type: String },     // 거주 지역
   },
   { timestamps: true }

@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 const sectionSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  content: { type: String },
+  items: [{ type: String, required: true }],
   order: { type: Number, required: true },
-});
+}, { _id: false });
 
 const recordSchema = new mongoose.Schema(
   {

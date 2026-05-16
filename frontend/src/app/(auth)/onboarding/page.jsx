@@ -5,6 +5,7 @@ import { Check } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { cn } from "@/lib/utils";
+import apiClient from "@/lib/apiClient";
 import { useAuthStore } from "@/stores/authStore";
 
 const MAX_NICKNAME_LENGTH = 5;
@@ -18,6 +19,7 @@ export default function OnboardingPage() {
   const beginOnboarding = useAuthStore((state) => state.beginOnboarding);
   const saveOnboardingNickname = useAuthStore((state) => state.saveOnboardingNickname);
   const completeOnboarding = useAuthStore((state) => state.completeOnboarding);
+  const updateUser = useAuthStore((state) => state.updateUser);
 
   const [nickname, setNickname] = useState(onboarding.nickname ?? "");
   const [isFocused, setIsFocused] = useState(false);
@@ -47,7 +49,7 @@ export default function OnboardingPage() {
     syncNickname(event.currentTarget.value);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const rawNickname = inputRef.current?.value ?? nickname;
     const finalNickname = getNicknameText(rawNickname).trim();
 
@@ -56,6 +58,22 @@ export default function OnboardingPage() {
     }
 
     completeOnboarding(finalNickname);
+    try {
+      const response = await apiClient.patch("/users/me", {
+        name: finalNickname,
+        onboardingCompleted: true,
+      });
+
+      if (response.user) {
+        updateUser(response.user);
+      }
+    } catch {
+      updateUser({
+        name: finalNickname,
+        nickname: finalNickname,
+        onboardingCompleted: true,
+      });
+    }
     setNickname(finalNickname);
     setIsFocused(false);
     setIsComplete(true);

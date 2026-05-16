@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api",
-  timeout: 15000,
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000",
+  timeout: 120000,
   headers: { "Content-Type": "application/json" },
 });
 
@@ -31,8 +31,15 @@ apiClient.interceptors.response.use(
       sessionStorage.removeItem("auth-storage");
       window.location.href = "/";
     }
+    if (error.code === "ECONNABORTED") {
+      return Promise.reject(
+        new Error("응답이 오래 걸리고 있어요. 잠시 후 다시 시도해주세요.")
+      );
+    }
     const message =
-      error.response?.data?.message || "서버에 문제가 생겼어요. 잠시 후 다시 시도해주세요.";
+      error.response?.data?.message ||
+      error.response?.data?.error?.message ||
+      "서버에 문제가 생겼어요. 잠시 후 다시 시도해주세요.";
     return Promise.reject(new Error(message));
   }
 );

@@ -1,4 +1,11 @@
-// 새 음성 기록 페이지 (/record/new?routineId=:id)
-export default function NewRecordPage() {
-  return null;
+import { Suspense } from "react";
+
+import NewRecordFlow from "@/components/record/NewRecordFlow";
+
+export default function NewRecordPage({ searchParams }) {
+  return (
+    <Suspense fallback={null}>
+      <NewRecordFlow routineId={searchParams?.routineId ?? null} />
+    </Suspense>
+  );
 }
